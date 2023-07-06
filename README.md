@@ -46,6 +46,15 @@ services:
 `pip install -r requirements.txt`
 
 ## CLI指令
+
+可以先以 `docker exec -it series-renamer /bin/bash` 進入Container後再使用指令
+
+或
+
+直接 `docker exec series-renamer python3 series_renamer.py scan-directory -s /app/rename`
+
+--------------------------------------------------------------------------------------------
+
 __**推薦**__
 
 偵測docker-compose.yaml裡設定的主資料夾路徑    
@@ -59,11 +68,7 @@ __**推薦**__
 `python3 series_renamer.py single-directory -d 路徑`
 
 --------------------------------------------------------------------------------------------
-可以先以 `docker exec -it series-renamer /bin/bash` 進入Container後再使用指令
 
-或
-
-直接 `docker exec series-renamer python 3 series_renamer.py scan-directory -s /app/rename`
 
 ## 定時自動啟用方法
 

@@ -72,57 +72,58 @@ def scan_directory(scan_directory):
         logger.error(f"Folder is empty.")
         os._exit(0)
 
-    # Check if folder structure is already established
-    for root, dirs, files in os.walk(absolute_path, topdown=False):
-        for index, file in enumerate(files):
-            if "Season" in os.path.split(root)[-1]:
-                if not re.search(REGEX_FILTER, file, re.IGNORECASE):
-                    series_name = os.path.split(os.path.split(root)[-2])[-1]
-                    season_number = (
-                        os.path.split(root)[-1].replace("Season ", "").zfill(2)
-                    )
-                    new_filename = f"{series_name} S{season_number}E{str(index+1).zfill(2)}{os.path.splitext(file)[-1]}"
-                    os.rename(
-                        os.path.join(root, file), f"{os.path.join(root, new_filename)}"
-                    )
-                    logger.success(f"{file} --> {new_filename}")
-
     # Search through files for files needing to renaming
+    file_ext_list = []
+    root_path_list = []
     file_list = []
     for root, dirs, files in os.walk(absolute_path, topdown=False):
         for file in files:
             if os.path.splitext(file)[-1] in FILE_FORMAT_FILTER:
                 # Skip already renamed
                 if not re.search(REGEX_FILTER, file, re.IGNORECASE):
+                    file_ext_list.append(os.path.splitext(file)[-1])
                     file_list.append(os.path.splitext(file)[0])
+                    root_path_list.append(root)
 
     # Get new file names
     if file_list:
-        query_list = renamer_module.rename_series(file_list)
+        gpt_response = renamer_module.rename_series(file_list)
+
+        # Add .extension back to file lists
+        file_list = [
+            basename + extension
+            for basename, extension in zip(file_list, file_ext_list)
+        ]
+
+        gpt_response = [
+            basename + extension
+            for basename, extension in zip(gpt_response, file_ext_list)
+        ]
+
+        rename_logger = list(zip(file_list.copy(), gpt_response.copy()))
+
+        # Add path back to file lists
+        file_list = [
+            os.path.join(path, filename)
+            for path, filename in zip(root_path_list, file_list)
+        ]
+
+        gpt_response = [
+            os.path.join(path, filename)
+            for path, filename in zip(root_path_list, gpt_response)
+        ]
+
+        # Rename all files to GPT response filename
+        rename_query = list(zip(file_list, gpt_response))
+        for filename_pair in rename_query:
+            os.rename(*filename_pair)
+
+        for logging_pair in rename_logger:
+            logger.success(f"{logging_pair[0]} --> {logging_pair[-1]}")
     else:
         pass
         # logger.info(f"No files needed for rename.")
         # os._exit(0)
-
-    # Rename all files
-    idx_counter = 0
-    for root, dirs, files in os.walk(absolute_path, topdown=False):
-        for file in files:
-            if os.path.splitext(file)[-1] in FILE_FORMAT_FILTER:
-                if not re.search(REGEX_FILTER, file, re.IGNORECASE):
-                    new_filename = (
-                        f"{query_list[idx_counter]}{os.path.splitext(file)[-1]}"
-                    )
-                    os.rename(
-                        os.path.join(root, file),
-                        os.path.join(
-                            root,
-                            f"{new_filename}",
-                        ),
-                    )
-                    logger.success(f"{file} --> {new_filename}")
-                    idx_counter += 1
-                    continue
 
     # Move all files to proper folders if already named properly
     for root, dirs, files in os.walk(absolute_path, topdown=False):
@@ -130,9 +131,19 @@ def scan_directory(scan_directory):
             if os.path.splitext(file)[-1] in FILE_FORMAT_FILTER:
                 # if already named properly
                 if re.search(REGEX_FILTER, file, re.IGNORECASE):
-                    series_name = re.sub(
-                        REGEX_FILTER, "", os.path.splitext(file)[0], re.IGNORECASE
-                    )
+                    if (
+                        "Season" in os.path.split(root)[-1]
+                    ):  # Existing season name found
+                        series_name = os.path.split(os.path.split(root)[0])[-1]
+                        new_file_name = f"{series_name}{re.search(REGEX_FILTER, file).group(0)}{os.path.splitext(file)[-1]}"
+                        os.rename(
+                            os.path.join(root, file), os.path.join(root, new_file_name)
+                        )
+                        logger.success(f"{file} --> {new_file_name}")
+                    else:
+                        series_name = re.sub(
+                            REGEX_FILTER, "", os.path.splitext(file)[0], re.IGNORECASE
+                        )
                     season_number = int(
                         re.search(
                             r"S(\d+)E", os.path.splitext(file)[0], re.IGNORECASE
@@ -149,11 +160,11 @@ def scan_directory(scan_directory):
                                 f"{destination}/{file}",
                             )
                             logger.success(
-                                f"Moving file: {os.path.join(root)} --> {destination}"
+                                f"Moving file: {os.path.join(root, file)} --> {os.path.normpath(f'{destination}/{file}')}"
                             )
                         else:
                             logger.error(
-                                f"File exists in destination! {os.path.normpath(f'{os.path.join(root)}/{file}')} skipped moving."
+                                f"File exists in destination! {os.path.join(root, file)} skipped."
                             )
 
         # Remove all empty directories

@@ -71,7 +71,23 @@ def scan_directory(scan_directory):
     if len(os.listdir(absolute_path)) == 0:
         logger.error(f"Folder is empty.")
         os._exit(0)
-    # Find all files
+
+    # Check if folder structure is already established
+    for root, dirs, files in os.walk(absolute_path, topdown=False):
+        for index, file in enumerate(files):
+            if "Season" in os.path.split(root)[-1]:
+                if not re.search(REGEX_FILTER, file, re.IGNORECASE):
+                    series_name = os.path.split(os.path.split(root)[-2])[-1]
+                    season_number = (
+                        os.path.split(root)[-1].replace("Season ", "").zfill(2)
+                    )
+                    new_filename = f"{series_name} S{season_number}E{str(index+1).zfill(2)}{os.path.splitext(file)[-1]}"
+                    os.rename(
+                        os.path.join(root, file), f"{os.path.join(root, new_filename)}"
+                    )
+                    logger.success(f"{file} --> {new_filename}")
+
+    # Search through files for files needing to renaming
     file_list = []
     for root, dirs, files in os.walk(absolute_path, topdown=False):
         for file in files:
@@ -84,7 +100,8 @@ def scan_directory(scan_directory):
     if file_list:
         query_list = renamer_module.rename_series(file_list)
     else:
-        logger.info(f"No files needed for rename.")
+        pass
+        # logger.info(f"No files needed for rename.")
         # os._exit(0)
 
     # Rename all files

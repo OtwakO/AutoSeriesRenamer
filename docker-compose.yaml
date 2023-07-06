@@ -1,0 +1,11 @@
+services:
+    series-renamer:
+        build: .
+        container_name: series-renamer
+        volumes:
+            - /path/to/directory:/app/rename # 設定媒體資料夾
+            - ./logs:/app/logs
+        restart: always
+        stdin_open: true
+        environment:
+            - TZ=Asia/Taipei

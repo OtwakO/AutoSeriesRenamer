@@ -136,10 +136,15 @@ def scan_directory(scan_directory):
                     ):  # Existing season name found
                         series_name = os.path.split(os.path.split(root)[0])[-1]
                         new_file_name = f"{series_name}{re.search(REGEX_FILTER, file).group(0)}{os.path.splitext(file)[-1]}"
-                        os.rename(
-                            os.path.join(root, file), os.path.join(root, new_file_name)
+                        current_series_name = re.sub(
+                            REGEX_FILTER, "", os.path.splitext(file)[0], re.IGNORECASE
                         )
-                        logger.success(f"{file} --> {new_file_name}")
+                        if series_name != current_series_name:
+                            os.rename(
+                                os.path.join(root, file),
+                                os.path.join(root, new_file_name),
+                            )
+                            logger.success(f"{file} --> {new_file_name}")
                     else:
                         series_name = re.sub(
                             REGEX_FILTER, "", os.path.splitext(file)[0], re.IGNORECASE

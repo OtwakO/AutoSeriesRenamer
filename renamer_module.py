@@ -7,6 +7,8 @@ from EdgeGPT.EdgeGPT import Chatbot, ConversationStyle
 
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
+PROMPT = '請你扮演一個檔案命名工具，我會以List的資料格式給予你許多的檔案名稱，你要將這些檔案名稱重新組合為 "節目名稱 S01E01" 這類的名稱，如果檔案名稱內有包含中文劇名請優先使用，如果沒有中文劇名的話請務必先線上查找中文劇名，如果檔案名稱看起來是劇場版或是特別篇就在劇名後面加上劇場版或是特別篇並以第0季來命名並，第幾季通常會以S1, S2之類的格式來辨別。 回答我的時候請只給予我重新組合的名稱不要有任何其他的字語。回答不要包含類似"好的，新的檔案名稱是"之類的詞語。單獨的把新的檔案名稱以List的資料格式給我。'
+
 
 async def renamer_engine(series_list, proxy):
     while True:
@@ -26,7 +28,7 @@ async def renamer_engine(series_list, proxy):
         try:
             # Passing cookies is "optional", as explained above
             initial_prompt = await bot.ask(
-                prompt='請你扮演一個檔案命名工具，我會以List的資料格式給予你許多的檔案名稱，你要將這些檔案名稱重新組合為 "節目名稱 S01E01" 這類的名稱，節目名稱通常會是中文。 回答我的時候請只給予我重新組合的名稱不要任何其他的字語。回答不要包含類似"好的，新的檔案名稱是"之類的詞語。單獨的把新的檔案名稱以List的資料格式給我。',
+                prompt=PROMPT,
                 conversation_style=ConversationStyle.precise,
                 simplify_response=True,
             )

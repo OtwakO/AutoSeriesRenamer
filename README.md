@@ -43,7 +43,11 @@ services:
 `docker compose up -d`
 
 ## 直接Python使用
+下載 https://github.com/tom28055101/AutoSeriesRenamer/releases/tag/release
+
 `pip install -r requirements.txt`
+
+`python series_renamer.py scan-directory -s 路徑`
 
 ## CLI指令
 

@@ -42,6 +42,16 @@ services:
 
 `docker compose up -d`
 
+--------------------------------------------------------------------------------------------
+
+更新
+
+`docker compose down`
+
+`git pull`
+
+`docker compose up -d`
+
 ## 直接Python使用
 下載 https://github.com/tom28055101/AutoSeriesRenamer/releases/tag/release
 

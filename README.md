@@ -31,6 +31,7 @@ services:
         container_name: series-renamer
         volumes:
             - /path/to/directory:/app/rename # 設定媒體資料夾
+            - ./bing_cookies:/app/bing_cookies # Cookies資料夾 (如需要可以將Cookies以bing_cookies_*.json的命名方式放入資料夾內，*為數字如1,2,3,4)
             - ./logs:/app/logs
         restart: always
         stdin_open: true

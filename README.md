@@ -51,7 +51,7 @@ services:
 
 `git pull`
 
-`docker compose up -d`
+`docker compose up --build --force-recreate`
 
 ## 直接Python使用
 下載 https://github.com/tom28055101/AutoSeriesRenamer/releases/tag/release

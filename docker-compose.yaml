@@ -3,8 +3,8 @@ services:
         build: .
         container_name: series-renamer
         volumes:
-            - ./bing_cookies:/app/bing_cookies
             - /path/to/directory:/app/rename # 設定媒體資料夾
+            - ./bing_cookies:/app/bing_cookies
             - ./logs:/app/logs
         restart: always
         stdin_open: true

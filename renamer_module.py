@@ -54,8 +54,9 @@ async def renamer_engine(series_list, proxy):
             break
         except Exception as e:
             logger.error(e)
+            logger.error("Error occurred, try again later.")
             await bot.close()
-            continue
+            os._exit(0)
     logger.info(f"Fetching finished.")
     logger.warning(f"{renamer['messages_left']} Messages left.")
     logger.debug(f"Result: {result}")
